@@ -18,8 +18,9 @@ google-api-python-client==2.139.0
 
 # PDF
 Jinja2==3.1.4
-WeasyPrint>=61.0
+xhtml2pdf>=0.2.11
 pypdf==4.3.1
+# WeasyPrint>=61.0  # alternativa com melhor CSS, requer GTK3 no Windows
 
 # pyhanko opcional (assinatura ICP-Brasil avancada)
 # pyhanko==0.22.0
