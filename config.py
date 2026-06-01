@@ -15,6 +15,8 @@ class Config:
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER', 'SignCert <noreply@signcert.app>')
+    MAIL_SUPPRESS_SEND = os.environ.get('MAIL_SUPPRESS_SEND', 'False') == 'True'
+    FLASK_DEBUG = os.environ.get('FLASK_DEBUG', 'False') == 'True'
 
     BASE_URL = os.environ.get('BASE_URL', 'http://localhost:5000')
     CREDENTIALS_ENCRYPTION_KEY = os.environ.get('CREDENTIALS_ENCRYPTION_KEY', '')
