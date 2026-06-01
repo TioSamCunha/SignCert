@@ -59,7 +59,7 @@ def submit(token):
     elif doc.status == 'pending_signatures':
         doc.status = 'partially_signed'
         db.session.commit()
-    return jsonify({'success': True, 'redirect': url_for('signing_view.sign_success', token=token)})
+    return jsonify({'success': True, 'redirect': url_for('signing_submit.sign_success', token=token)})
 
 
 @bp.route('/<token>/success')
