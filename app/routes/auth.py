@@ -11,7 +11,7 @@ bp = Blueprint('auth', __name__, url_prefix='/auth')
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('admin.dashboard.index'))
+        return redirect(url_for('admin_dashboard.index'))
     if request.method == 'POST':
         email = request.form.get('email', '').strip().lower()
         password = request.form.get('password', '')
@@ -22,7 +22,7 @@ def login():
             login_user(user, remember=request.form.get('remember') == 'on')
             audit.log('LOGIN', user_id=user.id, actor_email=user.email,
                       ip=request.remote_addr, user_agent=request.user_agent.string)
-            return redirect(request.args.get('next') or url_for('admin.dashboard.index'))
+            return redirect(request.args.get('next') or url_for('admin_dashboard.index'))
         flash('E-mail ou senha inválidos.', 'danger')
     return render_template('auth/login.html')
 
