@@ -35,9 +35,11 @@ def _build_certificate(doc: Document) -> str:
 
 
 def _merge_final(doc: Document, cert_path: str) -> str:
-    pdf_dir = current_app.config.get('GENERATED_PDFS_DIR', 'uploads/generated_pdfs')
+    from app.utils.paths import get_pdf_dir, abs_upload_path
+    pdf_dir = get_pdf_dir()
     output_path = os.path.join(pdf_dir, f'doc_{doc.id}_final.pdf')
-    return merge_pdfs(doc.draft_pdf_path, cert_path, output_path)
+    draft = abs_upload_path(doc.draft_pdf_path)
+    return merge_pdfs(draft, cert_path, output_path)
 
 
 def _try_drive_upload(doc: Document) -> None:

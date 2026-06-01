@@ -32,7 +32,9 @@ def submit(token):
     data_url = data.get('signature_data', '')
     sig_type = data.get('type', 'drawn')
     doc = Document.query.get(sig_req.document_id)
-    doc_hash = sha256_file(doc.draft_pdf_path) if doc.draft_pdf_path else ''
+    from app.utils.paths import abs_upload_path
+    draft_path = abs_upload_path(doc.draft_pdf_path) if doc.draft_pdf_path else ''
+    doc_hash = sha256_file(draft_path) if draft_path else ''
     ip = request.headers.get('X-Forwarded-For', request.remote_addr).split(',')[0].strip()
     ua = request.user_agent.string
     try:

@@ -63,18 +63,20 @@ def submit_cert(token):
     doc = Document.query.get(sig_req.document_id)
     ip = request.headers.get('X-Forwarded-For', request.remote_addr).split(',')[0].strip()
 
-    from flask import current_app
-    pdf_dir = current_app.config.get('GENERATED_PDFS_DIR', 'uploads/generated_pdfs')
+    from app.utils.paths import get_pdf_dir
+    pdf_dir = get_pdf_dir()
     signed_path = os.path.join(pdf_dir, f'doc_{doc.id}_cert_{sig_req.id}.pdf')
 
+    from app.utils.paths import abs_upload_path
+    draft_path = abs_upload_path(doc.draft_pdf_path)
     try:
         embed_digital_signature(
-            doc.draft_pdf_path, pkcs7_b64, cert_chain_pem,
+            draft_path, pkcs7_b64, cert_chain_pem,
             sig_req.signatory_name, signed_path)
     except Exception as e:
         return jsonify({'success': False, 'message': f'Erro ao embedar assinatura: {e}'}), 500
 
-    doc_hash = sha256_file(doc.draft_pdf_path)
+    doc_hash = sha256_file(draft_path)
     sig_req.signature_type = 'digital_cert'
     sig_req.document_hash_at_signing = doc_hash
     sig_req.signed_at = datetime.now(timezone.utc)
@@ -120,8 +122,8 @@ def submit_pfx(token):
         from app.services.digital_cert.pfx_signer import sign_pdf_hash
         pfx_bytes = base64.b64decode(pfx_b64)
         doc = Document.query.get(sig_req.document_id)
-
-        with open(doc.draft_pdf_path, 'rb') as f:
+        from app.utils.paths import abs_upload_path
+        with open(abs_upload_path(doc.draft_pdf_path), 'rb') as f:
             pdf_bytes = f.read()
 
         result = sign_pdf_hash(pdf_bytes, pfx_bytes, password)
@@ -138,8 +140,8 @@ def submit_pfx(token):
     signer_info = extract_signer_info(cert_chain[0])
     ip = request.headers.get('X-Forwarded-For', request.remote_addr).split(',')[0].strip()
 
-    from flask import current_app
-    pdf_dir = current_app.config.get('GENERATED_PDFS_DIR', 'uploads/generated_pdfs')
+    from app.utils.paths import get_pdf_dir
+    pdf_dir = get_pdf_dir()
     signed_path = os.path.join(pdf_dir, f'doc_{doc.id}_cert_{sig_req.id}.pdf')
 
     try:

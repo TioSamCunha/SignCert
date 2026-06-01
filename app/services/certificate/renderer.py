@@ -9,7 +9,8 @@ def generate_certificate_pdf(document) -> str:
     qr_b64 = _build_qr(document.uuid)
     html = render_template('certificate/certificate.html',
                            cert=data, qr_b64=qr_b64)
-    certs_dir = current_app.config.get('CERTIFICATES_DIR', 'uploads/certificates')
+    from app.utils.paths import get_certs_dir
+    certs_dir = get_certs_dir()
     os.makedirs(certs_dir, exist_ok=True)
     path = os.path.join(certs_dir, f'cert_{document.id}.pdf')
     html_to_pdf(html, path)

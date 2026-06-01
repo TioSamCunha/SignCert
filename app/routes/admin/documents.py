@@ -8,6 +8,7 @@ from app.models.sheet_connection import SheetConnection
 from app.services.pdf.renderer import load_template_html, render_to_html, html_to_pdf
 from app.services.pdf.hasher import sha256_file
 from app.services.sheets.reader import get_row_by_index, get_all_rows
+from app.utils.paths import get_pdf_dir, abs_upload_path
 import app.services.audit_service as audit
 
 bp = Blueprint('admin_documents', __name__, url_prefix='/admin/documents')
@@ -52,7 +53,7 @@ def new_document():
         doc.rendered_variables = variables
         db.session.add(doc)
         db.session.flush()
-        pdf_dir = 'uploads/generated_pdfs'
+        pdf_dir = get_pdf_dir()
         os.makedirs(pdf_dir, exist_ok=True)
         pdf_path = os.path.join(pdf_dir, f'doc_{doc.id}_draft.pdf')
         html_to_pdf(rendered_html, pdf_path)
@@ -81,7 +82,7 @@ def document_detail(doc_id):
 @login_required
 def download_pdf(doc_id):
     doc = Document.query.get_or_404(doc_id)
-    pdf_path = doc.pdf_path or doc.draft_pdf_path
+    pdf_path = abs_upload_path(doc.pdf_path or doc.draft_pdf_path or '')
     if not pdf_path or not os.path.exists(pdf_path):
         flash('PDF não disponível.', 'warning')
         return redirect(url_for('admin_documents.document_detail', doc_id=doc_id))

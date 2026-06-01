@@ -14,7 +14,8 @@ def save_signature_image(signature_request_id: int, data_url: str) -> str:
     img_data = base64.b64decode(match.group(1))
     if len(img_data) < 100:
         raise ValueError('Signature image is too small (blank)')
-    images_dir = current_app.config.get('SIGNATURE_IMAGES_DIR', 'uploads/signature_images')
+    from app.utils.paths import get_images_dir
+    images_dir = get_images_dir()
     os.makedirs(images_dir, exist_ok=True)
     path = os.path.join(images_dir, f'sig_{signature_request_id}.png')
     with open(path, 'wb') as f:

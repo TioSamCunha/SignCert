@@ -2,6 +2,7 @@ import os
 from flask import Blueprint, render_template, send_file, abort
 from app.models.document import Document
 from app.services.pdf.hasher import sha256_file
+from app.utils.paths import abs_upload_path
 import app.services.audit_service as audit
 from flask import request
 
@@ -16,8 +17,9 @@ def verify(uuid):
                                message='Documento não encontrado.')
     hash_ok = False
     current_hash = None
-    if doc.pdf_path and os.path.exists(doc.pdf_path):
-        current_hash = sha256_file(doc.pdf_path)
+    pdf_path = abs_upload_path(doc.pdf_path) if doc.pdf_path else None
+    if pdf_path and os.path.exists(pdf_path):
+        current_hash = sha256_file(pdf_path)
         hash_ok = (current_hash == doc.sha256_hash)
     sig_requests = doc.signature_requests.all()
     audit.log('VERIFICATION_CHECKED', document_id=doc.id,
@@ -36,7 +38,8 @@ def verify_qr(uuid):
 @bp.route('/<uuid>/download')
 def download_certificate(uuid):
     doc = Document.query.filter_by(uuid=uuid).first_or_404()
-    if not doc.pdf_path or not os.path.exists(doc.pdf_path):
+    pdf_path = abs_upload_path(doc.pdf_path) if doc.pdf_path else None
+    if not pdf_path or not os.path.exists(pdf_path):
         abort(404)
-    return send_file(doc.pdf_path, mimetype='application/pdf',
+    return send_file(pdf_path, mimetype='application/pdf',
                      as_attachment=True, download_name=f'{doc.title}_assinado.pdf')
