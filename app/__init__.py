@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask, redirect, url_for
 from config import config
 from app.extensions import db, migrate, login_manager, mail, csrf
 
@@ -13,6 +13,7 @@ def create_app(config_name: str = None) -> Flask:
 
     _init_extensions(app)
     _register_blueprints(app)
+    _register_index(app)
     _register_shell_context(app)
     _ensure_upload_dirs(app)
 
@@ -114,6 +115,12 @@ def _register_public_blueprints(app: Flask) -> None:
         app.register_blueprint(verify_bp)
     except ImportError:
         pass
+
+
+def _register_index(app: Flask) -> None:
+    @app.route('/')
+    def index():
+        return redirect(url_for('admin_dashboard.index'))
 
 
 def _register_shell_context(app: Flask) -> None:
