@@ -1,0 +1,23 @@
+{% set status_labels = {
+  'draft': ('Rascunho', 'bg-gray-100 text-gray-600'),
+  'pending_signatures': ('Aguardando', 'bg-yellow-100 text-yellow-700'),
+  'partially_signed': ('Parcial', 'bg-orange-100 text-orange-700'),
+  'completed': ('Concluído', 'bg-green-100 text-green-700'),
+  'cancelled': ('Cancelado', 'bg-red-100 text-red-600'),
+} %}
+{% set label, badge_cls = status_labels.get(doc.status, ('?', 'bg-gray-100')) %}
+{% set sigs = doc.signature_requests.all() %}
+{% set signed_count = sigs | selectattr('status', 'equalto', 'signed') | list | length %}
+<tr class="hover:bg-gray-50">
+  <td class="px-4 py-3">
+    <a href="{{ url_for('admin_documents.document_detail', doc_id=doc.id) }}"
+       class="text-indigo-600 hover:underline font-medium">{{ doc.title }}</a>
+  </td>
+  <td class="px-4 py-3">
+    <span class="px-2 py-0.5 rounded-full text-xs font-medium {{ badge_cls }}">{{ label }}</span>
+  </td>
+  <td class="px-4 py-3 text-sm text-gray-500">
+    {% if sigs %}{{ signed_count }}/{{ sigs|length }} assinaram{% else %}—{% endif %}
+  </td>
+  <td class="px-4 py-3 text-gray-400 text-sm">{{ doc.created_at.strftime('%d/%m/%Y') }}</td>
+</tr>

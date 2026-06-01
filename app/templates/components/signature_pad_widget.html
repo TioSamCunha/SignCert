@@ -1,0 +1,28 @@
+<div>
+  <div class="flex gap-3 mb-3">
+    <button onclick="setMode('drawn')" id="tab-drawn"
+            class="px-3 py-1.5 text-sm rounded-lg bg-indigo-100 text-indigo-700 font-medium">
+      ✍️ Desenhar
+    </button>
+    <button onclick="setMode('typed')" id="tab-typed"
+            class="px-3 py-1.5 text-sm rounded-lg text-gray-500 hover:bg-gray-100">
+      ⌨️ Digitar
+    </button>
+  </div>
+
+  <div id="pad-drawn">
+    <canvas id="signature-canvas" width="500" height="150"
+            class="border-2 border-dashed border-gray-300 rounded-lg bg-white cursor-crosshair w-full">
+    </canvas>
+    <button onclick="clearPad()" class="text-xs text-gray-400 hover:text-gray-600 mt-1">
+      Limpar
+    </button>
+  </div>
+
+  <div id="pad-typed" class="hidden">
+    <input type="text" id="typed-signature" placeholder="Digite seu nome completo"
+           oninput="renderTyped()"
+           class="w-full border-2 rounded-lg px-3 py-2 font-serif text-2xl italic text-gray-700">
+    <canvas id="typed-canvas" width="500" height="80" class="hidden"></canvas>
+  </div>
+</div>

@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block title %}Novo Documento{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto">
+  <h1 class="text-2xl font-bold mb-6">Gerar Documento</h1>
+  <div class="bg-white rounded-xl shadow-sm p-6">
+    {% include 'components/flash_messages.html' %}
+    <form method="POST" id="doc-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="mb-4">
+        <label class="block text-sm font-medium mb-1">Template</label>
+        <select name="template_id" required id="template-select" onchange="loadTemplateVars()"
+                class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-400 focus:outline-none">
+          <option value="">— Selecione —</option>
+          {% for t in templates %}
+          <option value="{{ t.id }}" data-vars='{{ t.variables_schema | tojson }}'>{{ t.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm font-medium mb-1">Título do Documento</label>
+        <input type="text" name="title" required
+               class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-400 focus:outline-none">
+      </div>
+      {% if sheets %}
+      <div class="mb-4">
+        <label class="block text-sm font-medium mb-1">Planilha (fonte de dados)</label>
+        <select name="sheet_connection_id" id="sheet-select" onchange="loadSheetRows()"
+                class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-400 focus:outline-none">
+          <option value="">— Manual (sem planilha) —</option>
+          {% for s in sheets %}
+          <option value="{{ s.id }}">{{ s.display_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div id="row-selector" class="mb-4 hidden">
+        <label class="block text-sm font-medium mb-1">Linha da Planilha</label>
+        <select name="row_index" id="row-select" onchange="fillVariables()"
+                class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-400 focus:outline-none">
+          <option value="">— Carregando... —</option>
+        </select>
+      </div>
+      {% endif %}
+      <div id="vars-section"></div>
+      <button type="submit" class="mt-4 bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700">
+        Gerar Documento
+      </button>
+    </form>
+  </div>
+</div>
+<script>
+let sheetRows = [];
+function loadTemplateVars() {
+  const sel = document.getElementById('template-select');
+  const opt = sel.options[sel.selectedIndex];
+  const vars = JSON.parse(opt.dataset.vars || '[]');
+  const section = document.getElementById('vars-section');
+  section.innerHTML = '';
+  vars.forEach(v => {
+    section.innerHTML += `<div class="mb-3">
+      <label class="block text-sm font-medium mb-1">${v.label || v.name}</label>
+      <input type="text" name="var_${v.name}" id="var-${v.name}"
+             class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-400 focus:outline-none">
+    </div>`;
+  });
+}
+async function loadSheetRows() {
+  const sheetId = document.getElementById('sheet-select').value;
+  if (!sheetId) { document.getElementById('row-selector').classList.add('hidden'); return; }
+  const resp = await fetch(`/admin/sheets/api/${sheetId}/rows`);
+  const data = await resp.json();
+  sheetRows = data.rows || [];
+  const sel = document.getElementById('row-select');
+  sel.innerHTML = '<option value="">— Selecione a linha —</option>';
+  sheetRows.forEach((row, i) => {
+    const preview = Object.values(row).slice(0,2).join(' — ');
+    sel.innerHTML += `<option value="${i+1}">${i+1}. ${preview}</option>`;
+  });
+  document.getElementById('row-selector').classList.remove('hidden');
+}
+function fillVariables() {
+  const idx = parseInt(document.getElementById('row-select').value) - 1;
+  if (isNaN(idx) || idx < 0 || idx >= sheetRows.length) return;
+  const row = sheetRows[idx];
+  Object.entries(row).forEach(([key, val]) => {
+    const input = document.getElementById(`var-${key}`);
+    if (input) input.value = val;
+  });
+}
+</script>
+{% endblock %}

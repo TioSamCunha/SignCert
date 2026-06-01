@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Editar' if action == 'edit' else 'Nova' }} Planilha{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto">
+  <h1 class="text-2xl font-bold mb-6">{{ 'Editar' if action == 'edit' else 'Conectar' }} Planilha Google</h1>
+  <div class="bg-white rounded-xl shadow-sm p-6">
+    {% include 'components/flash_messages.html' %}
+    <form method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="mb-4">
+        <label class="block text-sm font-medium mb-1">Nome de exibição</label>
+        <input type="text" name="display_name" required value="{{ conn.display_name if conn else '' }}"
+               class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-400 focus:outline-none">
+      </div>
+      {% if action == 'new' %}
+      <div class="mb-4">
+        <label class="block text-sm font-medium mb-1">ID da Planilha</label>
+        <input type="text" name="spreadsheet_id" required placeholder="Ex: 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms"
+               class="w-full border rounded-lg px-3 py-2 font-mono text-sm focus:ring-2 focus:ring-indigo-400 focus:outline-none">
+        <p class="text-xs text-gray-400 mt-1">Encontrado na URL da planilha: ...spreadsheets/d/<strong>ID</strong>/edit</p>
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm font-medium mb-1">Credenciais da Conta de Serviço (JSON)</label>
+        <textarea name="service_account_json" required rows="6" placeholder='{"type": "service_account", ...}'
+                  class="w-full border rounded-lg px-3 py-2 font-mono text-xs focus:ring-2 focus:ring-indigo-400 focus:outline-none"></textarea>
+      </div>
+      {% endif %}
+      <div class="grid grid-cols-2 gap-4 mb-6">
+        <div>
+          <label class="block text-sm font-medium mb-1">Nome da Aba</label>
+          <input type="text" name="sheet_tab_name" value="{{ conn.sheet_tab_name if conn else 'Sheet1' }}"
+                 class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-400 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Linha do Cabeçalho</label>
+          <input type="number" name="header_row" min="1" value="{{ conn.header_row if conn else 1 }}"
+                 class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-400 focus:outline-none">
+        </div>
+      </div>
+      <div class="flex gap-3">
+        <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700">
+          {{ 'Salvar' if action == 'edit' else 'Conectar' }}
+        </button>
+        <a href="{{ url_for('admin_sheets.list_sheets') }}" class="px-4 py-2 text-gray-500 hover:text-gray-700">
+          Cancelar
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

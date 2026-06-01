@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"></head>
+<body style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto; padding: 20px;">
+  <h2 style="color: #4338ca;">✒️ {{ platform }}</h2>
+  <p>O documento abaixo foi completamente assinado por todos os signatários:</p>
+  <blockquote style="border-left: 4px solid #16a34a; padding: 8px 16px; color: #555;">
+    {{ document.title }}
+  </blockquote>
+  <p>UUID: <code>{{ document.uuid }}</code></p>
+  <p>Concluído em: {{ document.completed_at }}</p>
+  <hr style="border-color:#eee;">
+  <p style="font-size:11px; color:#aaa;">{{ platform }} — Plataforma de Assinaturas Eletrônicas</p>
+</body>
+</html>

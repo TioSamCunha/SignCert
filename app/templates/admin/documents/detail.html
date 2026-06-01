@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block title %}{{ doc.title }}{% endblock %}
+{% block content %}
+{% set status_labels = {'draft':('Rascunho','gray'),'pending_signatures':('Aguardando','yellow'),'partially_signed':('Parcial','orange'),'completed':('Concluído','green'),'cancelled':('Cancelado','red')} %}
+{% set label, color = status_labels.get(doc.status, ('?','gray')) %}
+
+<div class="flex items-start justify-between mb-6">
+  <div>
+    <h1 class="text-2xl font-bold">{{ doc.title }}</h1>
+    <span class="inline-block mt-1 px-3 py-1 rounded-full text-sm font-medium bg-{{ color }}-100 text-{{ color }}-700">
+      {{ label }}
+    </span>
+  </div>
+  <div class="flex gap-2">
+    <a href="{{ url_for('admin_documents.download_pdf', doc_id=doc.id) }}"
+       class="bg-white border text-gray-700 px-3 py-2 rounded-lg text-sm hover:bg-gray-50">
+      ⬇ Baixar PDF
+    </a>
+    {% if doc.status not in ('completed','cancelled') %}
+    <a href="{{ url_for('admin_signatories.send_request', doc_id=doc.id) }}"
+       class="bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-indigo-700">
+      + Enviar para Assinar
+    </a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+  <div class="bg-white rounded-xl shadow-sm p-5">
+    <h2 class="font-semibold mb-3">Informações</h2>
+    <dl class="text-sm space-y-2">
+      <div class="flex"><dt class="w-32 text-gray-500">UUID:</dt><dd class="font-mono text-xs">{{ doc.uuid }}</dd></div>
+      <div class="flex"><dt class="w-32 text-gray-500">Template:</dt><dd>{{ doc.template.name }}</dd></div>
+      <div class="flex"><dt class="w-32 text-gray-500">SHA-256:</dt><dd class="font-mono text-xs">{{ doc.sha256_draft_hash or '—' }}</dd></div>
+      <div class="flex"><dt class="w-32 text-gray-500">Criado em:</dt><dd>{{ doc.created_at.strftime('%d/%m/%Y %H:%M') }}</dd></div>
+      {% if doc.completed_at %}
+      <div class="flex"><dt class="w-32 text-gray-500">Concluído em:</dt><dd>{{ doc.completed_at.strftime('%d/%m/%Y %H:%M') }}</dd></div>
+      {% endif %}
+      {% if doc.drive_file_url %}
+      <div class="flex"><dt class="w-32 text-gray-500">Google Drive:</dt>
+        <dd><a href="{{ doc.drive_file_url }}" target="_blank" class="text-indigo-600 hover:underline text-xs">Abrir no Drive</a></dd>
+      </div>
+      {% endif %}
+    </dl>
+  </div>
+
+  <div class="bg-white rounded-xl shadow-sm p-5">
+    <h2 class="font-semibold mb-3">Signatários</h2>
+    {% if sig_requests %}
+    {% for sr in sig_requests %}
+    {% set sr_labels = {'pending':('Pendente','gray'),'link_opened':('Link aberto','blue'),'otp_sent':('OTP enviado','yellow'),'otp_verified':('OTP verificado','orange'),'signed':('Assinado','green'),'expired':('Expirado','red'),'cancelled':('Cancelado','red')} %}
+    {% set sr_label, sr_color = sr_labels.get(sr.status, ('?','gray')) %}
+    <div class="flex items-center justify-between py-2 border-b last:border-0">
+      <div>
+        <p class="text-sm font-medium">{{ sr.signatory_name }}</p>
+        <p class="text-xs text-gray-400">{{ sr.signatory_email }}</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-{{ sr_color }}-100 text-{{ sr_color }}-700">
+          {{ sr_label }}
+        </span>
+        {% if sr.status not in ('signed','cancelled') %}
+        <form method="POST" action="{{ url_for('admin_signatories.resend_request', req_id=sr.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="text-xs text-indigo-500 hover:underline">Reenviar</button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <p class="text-sm text-gray-400">Nenhum signatário adicionado.</p>
+    {% endif %}
+  </div>
+</div>
+
+<div class="bg-white rounded-xl shadow-sm p-5">
+  <h2 class="font-semibold mb-3">Trilha de Auditoria</h2>
+  {% if trail %}
+  <div class="space-y-1">
+    {% for entry in trail %}
+    <div class="flex text-xs text-gray-600 py-1 border-b last:border-0">
+      <span class="w-36 text-gray-400 shrink-0">{{ entry.timestamp.strftime('%d/%m %H:%M:%S') }}</span>
+      <span class="w-48 font-mono shrink-0">{{ entry.action }}</span>
+      <span class="text-gray-500">{{ entry.actor_email }}</span>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="text-sm text-gray-400">Sem registros.</p>
+  {% endif %}
+</div>
+{% endblock %}

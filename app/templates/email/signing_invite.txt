@@ -1,0 +1,10 @@
+{{ platform }} — Convite para Assinatura
+
+Olá, {{ sig_req.signatory_name }}!
+
+Você foi convidado(a) para assinar o documento: {{ sig_req.document.title }}
+
+Link para assinar: {{ signing_url }}
+
+Este link expira em {{ config.SIGNING_TOKEN_EXPIRES_HOURS }} horas.
+Se não reconhece este pedido, ignore este e-mail.

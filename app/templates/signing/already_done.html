@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Já Assinado — SignCert</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center">
+<div class="max-w-md mx-auto text-center px-4">
+  <div class="bg-white rounded-xl shadow-md p-10">
+    <div class="text-6xl mb-4">{{ '✅' if sig_req.status == 'signed' else '🚫' }}</div>
+    <h1 class="text-xl font-bold mb-2">
+      {{ 'Documento já assinado' if sig_req.status == 'signed' else 'Pedido cancelado' }}
+    </h1>
+    <p class="text-gray-500 text-sm">Nenhuma ação adicional é necessária.</p>
+  </div>
+</div>
+</body>
+</html>

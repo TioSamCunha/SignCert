@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.6; margin: 60px 80px; color: #111; }
+  h1 { text-align: center; font-size: 14pt; margin-bottom: 30px; }
+  p { text-align: justify; margin-bottom: 12px; }
+  .parties { margin: 20px 0; }
+  .signature-area { margin-top: 60px; display: flex; justify-content: space-around; }
+  .sig-line { text-align: center; }
+  .sig-line hr { width: 200px; border-top: 1px solid #333; }
+</style>
+</head>
+<body>
+
+<h1>CONTRATO DE PRESTAÇÃO DE SERVIÇOS</h1>
+
+<p>Pelo presente instrumento particular, as partes:</p>
+
+<div class="parties">
+  <p><strong>CONTRATANTE:</strong> {{ nome_contratante }}, {{ qualificacao_contratante }},
+  inscrito(a) no CPF/CNPJ sob o nº {{ cpf_cnpj_contratante }}, residente/sediado(a) em {{ endereco_contratante }}.</p>
+
+  <p><strong>CONTRATADO:</strong> {{ nome_contratado }}, {{ qualificacao_contratado }},
+  inscrito(a) no CPF/CNPJ sob o nº {{ cpf_cnpj_contratado }}, residente/sediado(a) em {{ endereco_contratado }}.</p>
+</div>
+
+<p>Resolvem celebrar o presente Contrato de Prestação de Serviços, mediante as seguintes cláusulas e condições:</p>
+
+<p><strong>CLÁUSULA 1ª – DO OBJETO:</strong> O presente contrato tem por objeto {{ objeto_contrato }}.</p>
+
+<p><strong>CLÁUSULA 2ª – DO PRAZO:</strong> O prazo de vigência deste contrato é de {{ prazo_vigencia }},
+com início em {{ data_inicio }} e término em {{ data_fim }}.</p>
+
+<p><strong>CLÁUSULA 3ª – DO VALOR:</strong> Pelos serviços prestados, o CONTRATANTE pagará ao CONTRATADO
+o valor de R$ {{ valor_contrato }} ({{ valor_extenso }}), conforme condições acordadas.</p>
+
+<p><strong>CLÁUSULA 4ª – DO FORO:</strong> Para dirimir quaisquer controvérsias oriundas deste contrato,
+as partes elegem o foro da comarca de {{ cidade_foro }}, Estado de {{ estado_foro }}.</p>
+
+<p>E por estarem assim justos e contratados, firmam o presente instrumento.</p>
+
+<p style="text-align: center; margin-top: 30px;">{{ cidade_foro }}, {{ data_assinatura }}.</p>
+
+<div class="signature-area">
+  <div class="sig-line">
+    <hr>
+    <p>{{ nome_contratante }}<br>CONTRATANTE</p>
+  </div>
+  <div class="sig-line">
+    <hr>
+    <p>{{ nome_contratado }}<br>CONTRATADO</p>
+  </div>
+</div>
+
+</body>
+</html>

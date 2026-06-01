@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Planilhas{% endblock %}
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+  <h1 class="text-2xl font-bold">Planilhas Google</h1>
+  <a href="{{ url_for('admin_sheets.new_sheet') }}"
+     class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700">
+    + Conectar Planilha
+  </a>
+</div>
+{% if sheets %}
+<div class="bg-white rounded-xl shadow-sm overflow-hidden">
+  <table class="w-full text-sm">
+    <thead class="bg-gray-50 text-gray-500 text-left">
+      <tr>
+        <th class="px-4 py-3">Nome</th>
+        <th class="px-4 py-3">Aba</th>
+        <th class="px-4 py-3">ID da Planilha</th>
+        <th class="px-4 py-3">Ações</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y">
+      {% for s in sheets %}
+      <tr class="hover:bg-gray-50">
+        <td class="px-4 py-3 font-medium">{{ s.display_name }}</td>
+        <td class="px-4 py-3 text-gray-500">{{ s.sheet_tab_name }}</td>
+        <td class="px-4 py-3 font-mono text-xs text-gray-400">{{ s.spreadsheet_id }}</td>
+        <td class="px-4 py-3 flex gap-2">
+          <a href="{{ url_for('admin_sheets.edit_sheet', sheet_id=s.id) }}"
+             class="text-indigo-600 hover:underline text-xs">Editar</a>
+          <form method="POST" action="{{ url_for('admin_sheets.delete_sheet', sheet_id=s.id) }}"
+                onsubmit="return confirm('Remover conexão?')">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="text-red-500 hover:underline text-xs">Remover</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="bg-white rounded-xl shadow-sm p-8 text-center text-gray-400">
+  <p>Nenhuma planilha conectada ainda.</p>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}SignCert{% endblock %} - {{ config.PLATFORM_NAME }}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen">
+
+{% if current_user.is_authenticated %}
+<nav class="bg-indigo-700 text-white shadow">
+  <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-14">
+    <a href="{{ url_for('admin_dashboard.index') }}" class="font-bold text-lg tracking-tight">
+      ✒️ {{ config.PLATFORM_NAME }}
+    </a>
+    <div class="flex items-center gap-6 text-sm">
+      <a href="{{ url_for('admin_documents.list_documents') }}" class="hover:text-indigo-200">Documentos</a>
+      <a href="{{ url_for('admin_templates.list_templates') }}" class="hover:text-indigo-200">Templates</a>
+      <a href="{{ url_for('admin_sheets.list_sheets') }}" class="hover:text-indigo-200">Planilhas</a>
+      <span class="text-indigo-300">|</span>
+      <span>{{ current_user.full_name }}</span>
+      <a href="{{ url_for('auth.logout') }}" class="hover:text-red-300">Sair</a>
+    </div>
+  </div>
+</nav>
+{% endif %}
+
+<main class="max-w-7xl mx-auto px-4 py-6">
+  {% include 'components/flash_messages.html' %}
+  {% block content %}{% endblock %}
+</main>
+
+</body>
+</html>

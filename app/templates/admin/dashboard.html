@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-6">Dashboard</h1>
+
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+  {% set cards = [
+    ('Total de Documentos', stats.total_documents, 'bg-indigo-50 text-indigo-700'),
+    ('Aguardando Assinaturas', stats.pending, 'bg-yellow-50 text-yellow-700'),
+    ('Parcialmente Assinados', stats.partially_signed, 'bg-orange-50 text-orange-700'),
+    ('Concluídos', stats.completed, 'bg-green-50 text-green-700'),
+  ] %}
+  {% for label, value, cls in cards %}
+  <div class="rounded-xl p-5 shadow-sm {{ cls }}">
+    <p class="text-3xl font-bold">{{ value }}</p>
+    <p class="text-sm mt-1">{{ label }}</p>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="bg-white rounded-xl shadow-sm p-6">
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="text-lg font-semibold">Documentos Recentes</h2>
+    <a href="{{ url_for('admin_documents.list_documents') }}"
+       class="text-sm text-indigo-600 hover:underline">Ver todos →</a>
+  </div>
+  {% if stats.recent_documents %}
+  <table class="w-full text-sm">
+    <thead class="text-left text-gray-500 border-b">
+      <tr>
+        <th class="pb-2">Título</th>
+        <th class="pb-2">Status</th>
+        <th class="pb-2">Criado em</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for doc in stats.recent_documents %}
+      {% include 'components/document_row.html' %}
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="text-gray-400 text-sm">Nenhum documento criado ainda.
+    <a href="{{ url_for('admin_documents.new_document') }}" class="text-indigo-600 hover:underline">Criar primeiro →</a>
+  </p>
+  {% endif %}
+</div>
+{% endblock %}

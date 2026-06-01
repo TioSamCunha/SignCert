@@ -1,0 +1,7 @@
+{{ platform }} — Código de Verificação
+
+Olá, {{ sig_req.signatory_name }}!
+
+Seu código de verificação é: {{ code }}
+
+Válido por 10 minutos. Não compartilhe este código.

@@ -1,0 +1,40 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.env
+.venv
+venv/
+env/
+
+# Database
+*.db
+*.sqlite3
+
+# Uploads (gerados em runtime)
+uploads/generated_pdfs/*.pdf
+uploads/signature_images/*.png
+uploads/certificates/*.pdf
+
+# Google credentials
+secrets/
+*.json
+
+# Migrations auto-generated (manter migrations/ mas não sqllite)
+instance/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

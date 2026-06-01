@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assinar Documento — SignCert</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+<div class="max-w-4xl mx-auto px-4 py-8">
+  <div class="text-center mb-6">
+    <h1 class="text-2xl font-bold text-indigo-700">✒️ SignCert</h1>
+    <p class="text-gray-500 text-sm">Assinatura Eletrônica Avançada</p>
+  </div>
+
+  <div class="bg-white rounded-xl shadow p-6 mb-6">
+    <h2 class="font-semibold text-lg mb-1">{{ doc.title }}</h2>
+    <p class="text-sm text-gray-500">Olá, <strong>{{ sig_req.signatory_name }}</strong>. Por favor, revise o documento abaixo e assine.</p>
+  </div>
+
+  <div class="bg-white rounded-xl shadow mb-6 overflow-hidden">
+    <iframe src="{{ url_for('admin_documents.download_pdf', doc_id=doc.id) }}"
+            class="w-full" style="height:500px;" title="Documento"></iframe>
+  </div>
+
+  <div class="bg-white rounded-xl shadow p-6">
+    <h3 class="font-semibold mb-4">Etapas para assinar</h3>
+
+    <!-- Passo 1: OTP -->
+    <div id="step-otp" class="mb-6">
+      <p class="text-sm text-gray-600 mb-3">
+        Clique abaixo para receber um código de verificação no e-mail
+        <strong>{{ sig_req.signatory_email[:3] }}***</strong>
+      </p>
+      <button id="btn-request-otp" onclick="requestOtp()"
+              class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700">
+        Solicitar Código
+      </button>
+      <div id="otp-input" class="hidden mt-3">
+        <input type="text" id="otp-code" maxlength="6" placeholder="000000"
+               class="border rounded-lg px-3 py-2 text-center text-xl tracking-widest w-32 mr-2">
+        <button onclick="verifyOtp()"
+                class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700">
+          Verificar
+        </button>
+      </div>
+      <p id="otp-msg" class="text-sm mt-2"></p>
+    </div>
+
+    <!-- Passo 2: Assinatura -->
+    <div id="step-sign" class="opacity-40 pointer-events-none">
+      {% include 'components/signature_pad_widget.html' %}
+    </div>
+
+    <!-- Passo 3: Confirmar -->
+    <button id="btn-submit" onclick="submitSignature()"
+            class="mt-4 w-full bg-indigo-700 text-white py-3 rounded-lg font-semibold hidden hover:bg-indigo-800">
+      ✅ Confirmar Assinatura
+    </button>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/signature_pad.min.js') }}"></script>
+<script>
+  const TOKEN = "{{ token }}";
+</script>
+<script src="{{ url_for('static', filename='js/signing.js') }}"></script>
+</body>
+</html>
