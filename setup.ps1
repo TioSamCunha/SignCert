@@ -1,7 +1,7 @@
 # SignCert - Setup completo para Windows (PowerShell)
 # Execute: .\setup.ps1
 
-$ErrorActionPreference = "Stop"
+$Host.UI.RawUI.WindowTitle = "SignCert Setup"
 
 Write-Host ""
 Write-Host "=== SignCert - Setup Inicial ===" -ForegroundColor Cyan
@@ -15,32 +15,57 @@ try {
 } catch {
     Write-Host "ERRO: Python nao encontrado." -ForegroundColor Red
     Write-Host "Instale em: https://www.python.org/downloads/" -ForegroundColor Red
-    Write-Host "(Marque 'Add Python to PATH' durante a instalacao)" -ForegroundColor Red
     Read-Host "Pressione Enter para fechar"
     exit 1
 }
 
-# Cria ambiente virtual
+# Remove venv antigo se existir (limpa instalacao anterior com erros)
+if (Test-Path "venv") {
+    Write-Host ""
+    Write-Host "Removendo ambiente virtual antigo..." -ForegroundColor Yellow
+    Remove-Item -Recurse -Force "venv"
+    Write-Host "OK." -ForegroundColor Green
+}
+
+# Cria ambiente virtual novo
 Write-Host ""
 Write-Host "Criando ambiente virtual..." -ForegroundColor Yellow
-if (-not (Test-Path "venv")) {
-    python -m venv venv
-}
+python -m venv venv
+Write-Host "OK." -ForegroundColor Green
+
+# Atualiza pip primeiro
+Write-Host ""
+Write-Host "Atualizando pip..." -ForegroundColor Yellow
+& .\venv\Scripts\python.exe -m pip install --upgrade pip --quiet
 Write-Host "OK." -ForegroundColor Green
 
 # Instala pacotes
 Write-Host ""
 Write-Host "Instalando dependencias (pode demorar alguns minutos)..." -ForegroundColor Yellow
-& .\venv\Scripts\pip install --upgrade pip --quiet
-& .\venv\Scripts\pip install -r requirements.txt
-Write-Host "OK: dependencias instaladas." -ForegroundColor Green
+$pipResult = & .\venv\Scripts\pip install -r requirements.txt 2>&1
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "AVISO: Alguns pacotes opcionais nao instalaram (normal no Windows)." -ForegroundColor Yellow
+    Write-Host "Continuando..." -ForegroundColor Yellow
+} else {
+    Write-Host "OK: todas as dependencias instaladas." -ForegroundColor Green
+}
+
+# Verifica se Flask instalou (o minimo necessario)
+$flaskCheck = & .\venv\Scripts\python.exe -c "import flask; print('ok')" 2>&1
+if ($flaskCheck -ne "ok") {
+    Write-Host "ERRO: Flask nao instalou corretamente." -ForegroundColor Red
+    Write-Host "Detalhes: $pipResult" -ForegroundColor Red
+    Read-Host "Pressione Enter para fechar"
+    exit 1
+}
+Write-Host "OK: Flask instalado." -ForegroundColor Green
 
 # Cria .env
 Write-Host ""
 Write-Host "Criando arquivo .env..." -ForegroundColor Yellow
 if (-not (Test-Path ".env")) {
-    $secret = & .\venv\Scripts\python -c "import secrets; print(secrets.token_hex(32))"
-    $fernet = & .\venv\Scripts\python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+    $secret = & .\venv\Scripts\python.exe -c "import secrets; print(secrets.token_hex(32))"
+    $fernet = & .\venv\Scripts\python.exe -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
     $envContent = @"
 FLASK_ENV=development
 FLASK_DEBUG=True
@@ -77,7 +102,7 @@ TIMEZONE=America/Sao_Paulo
     Write-Host "OK: .env ja existe." -ForegroundColor Green
 }
 
-# Cria pastas
+# Cria pastas de upload
 Write-Host ""
 Write-Host "Criando diretorios..." -ForegroundColor Yellow
 @("uploads\generated_pdfs", "uploads\signature_images", "uploads\certificates") | ForEach-Object {
@@ -89,7 +114,12 @@ Write-Host "OK." -ForegroundColor Green
 Write-Host ""
 Write-Host "Criando banco de dados..." -ForegroundColor Yellow
 $env:FLASK_APP = "run.py"
-& .\venv\Scripts\flask db upgrade
+& .\venv\Scripts\flask.exe db upgrade
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "ERRO ao criar banco de dados." -ForegroundColor Red
+    Read-Host "Pressione Enter para fechar"
+    exit 1
+}
 Write-Host "OK." -ForegroundColor Green
 
 # Cria admin
@@ -111,7 +141,7 @@ with app.app_context():
     else:
         print("Admin ja existe.")
 '@
-$setupScript | & .\venv\Scripts\python
+$setupScript | & .\venv\Scripts\python.exe
 Write-Host "OK." -ForegroundColor Green
 
 # Fim

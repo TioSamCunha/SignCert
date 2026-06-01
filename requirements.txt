@@ -18,25 +18,27 @@ google-api-python-client==2.139.0
 
 # PDF
 Jinja2==3.1.4
-WeasyPrint==62.3
+WeasyPrint>=61.0
 pypdf==4.3.1
-pyhanko==0.22.0
-pyhanko-certvalidator==0.26.3
+
+# pyhanko opcional (assinatura ICP-Brasil avancada)
+# pyhanko==0.22.0
+# pyhanko-certvalidator==0.26.3
 
 # Crypto / Auth
-cryptography==42.0.8
+cryptography>=42.0.0
 PyJWT==2.9.0
 bcrypt==4.2.0
 
 # QR Code
-qrcode[pil]==7.4.2
-Pillow==10.4.0
+qrcode[pil]>=7.4.2
+Pillow>=11.0.0
 
 # HTTP / Geo
 requests==2.32.3
 
 # SMS OTP (opcional)
-twilio==9.3.3
+# twilio==9.3.3
 
 # Scheduler (lembretes)
 APScheduler==3.10.4
