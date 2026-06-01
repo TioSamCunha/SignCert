@@ -24,7 +24,7 @@ uploads/certificates/*.pdf
 secrets/
 *.json
 
-# Migrations auto-generated (manter migrations/ mas não sqllite)
+migrations/
 instance/
 
 # IDE
