@@ -1,8 +1,10 @@
 """
 Route for ICP-Brasil digital certificate signing.
-The browser signs using Web Crypto API with the user's .pfx/.p12 key,
-then posts the PKCS#7 signature and certificate chain to this endpoint.
+Supports two modes:
+  1. Browser-side: browser sends pre-computed pkcs7_signature + cert_chain_pem
+  2. Server-side (default): browser uploads .pfx, server parses and signs in memory
 """
+import base64
 import os
 from datetime import datetime, timezone
 from flask import Blueprint, request, jsonify, render_template, url_for
@@ -86,6 +88,79 @@ def submit_cert(token):
               details={'type': 'digital_cert_icp_brasil',
                        'cert_subject': signer_info.get('name'),
                        'hash': doc_hash},
+              ip=ip, user_agent=request.user_agent.string)
+
+    if check_all_signed(doc.id):
+        try:
+            finalize_document(doc.id)
+        except Exception:
+            pass
+    elif doc.status == 'pending_signatures':
+        doc.status = 'partially_signed'
+        db.session.commit()
+
+    return jsonify({'success': True,
+                    'redirect': url_for('signing_submit.sign_success', token=token)})
+
+
+@bp.route('/<token>/submit-pfx', methods=['POST'])
+def submit_pfx(token):
+    """Server-side .pfx parsing: browser sends base64(pfx) + password over HTTPS."""
+    sig_req = _load_sig_req(token)
+    if not sig_req:
+        return jsonify({'success': False, 'message': 'Link inválido ou expirado.'}), 403
+
+    data = request.json or {}
+    pfx_b64 = data.get('pfx_b64', '')
+    password = data.get('password', '')
+    if not pfx_b64:
+        return jsonify({'success': False, 'message': 'Arquivo .pfx não recebido.'}), 400
+
+    try:
+        from app.services.digital_cert.pfx_signer import sign_pdf_hash
+        pfx_bytes = base64.b64decode(pfx_b64)
+        doc = Document.query.get(sig_req.document_id)
+
+        with open(doc.draft_pdf_path, 'rb') as f:
+            pdf_bytes = f.read()
+
+        result = sign_pdf_hash(pdf_bytes, pfx_bytes, password)
+    except ValueError as e:
+        return jsonify({'success': False, 'message': f'Erro ao processar certificado: {e}'}), 400
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Certificado inválido ou senha incorreta: {e}'}), 400
+
+    cert_chain = [result['cert_pem']] + result['chain_pems']
+    valid, msg = validate_icp_brasil_chain(cert_chain)
+    if not valid:
+        return jsonify({'success': False, 'message': msg}), 400
+
+    signer_info = extract_signer_info(cert_chain[0])
+    ip = request.headers.get('X-Forwarded-For', request.remote_addr).split(',')[0].strip()
+
+    from flask import current_app
+    pdf_dir = current_app.config.get('GENERATED_PDFS_DIR', 'uploads/generated_pdfs')
+    signed_path = os.path.join(pdf_dir, f'doc_{doc.id}_cert_{sig_req.id}.pdf')
+
+    try:
+        embed_digital_signature(doc.draft_pdf_path, result['signature_b64'],
+                                cert_chain, sig_req.signatory_name, signed_path)
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Erro ao incorporar assinatura: {e}'}), 500
+
+    sig_req.signature_type = 'digital_cert'
+    sig_req.document_hash_at_signing = result['pdf_hash_hex']
+    sig_req.signed_at = datetime.now(timezone.utc)
+    sig_req.status = 'signed'
+    sig_req.ip_address = ip
+    db.session.commit()
+
+    audit.log('SIGNATURE_SUBMITTED', document_id=doc.id,
+              signature_request_id=sig_req.id,
+              actor_email=sig_req.signatory_email,
+              details={'type': 'digital_cert_server_side',
+                       'cert_subject': signer_info.get('name'),
+                       'hash': result['pdf_hash_hex']},
               ip=ip, user_agent=request.user_agent.string)
 
     if check_all_signed(doc.id):
