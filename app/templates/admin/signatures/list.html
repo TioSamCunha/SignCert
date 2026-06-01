@@ -2,20 +2,23 @@
 {% block title %}Pedidos de Assinatura{% endblock %}
 {% block content %}
 <h1 class="text-2xl font-bold mb-6">Pedidos de Assinatura</h1>
+{% set status_colors = {'pending':'gray','link_opened':'blue','otp_sent':'yellow','otp_verified':'orange','signed':'green','expired':'red','cancelled':'red'} %}
 {% if reqs %}
 <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-  <table class="w-full text-sm">
+  <div class="overflow-x-auto">
+  <table class="w-full text-sm min-w-[520px]">
     <thead class="bg-gray-50 text-gray-500 text-left">
       <tr>
         <th class="px-4 py-3">Signatário</th>
         <th class="px-4 py-3">Documento</th>
-        <th class="px-4 py-3">Método</th>
+        <th class="px-4 py-3 hidden sm:table-cell">Método</th>
         <th class="px-4 py-3">Status</th>
-        <th class="px-4 py-3">Criado em</th>
+        <th class="px-4 py-3 hidden sm:table-cell">Criado em</th>
       </tr>
     </thead>
     <tbody class="divide-y">
       {% for r in reqs %}
+      {% set sc = status_colors.get(r.status, 'gray') %}
       <tr class="hover:bg-gray-50">
         <td class="px-4 py-3">
           <p class="font-medium">{{ r.signatory_name }}</p>
@@ -25,15 +28,16 @@
           <a href="{{ url_for('admin_documents.document_detail', doc_id=r.document_id) }}"
              class="text-indigo-600 hover:underline text-sm">{{ r.document.title }}</a>
         </td>
-        <td class="px-4 py-3 text-gray-500 text-xs">{{ r.method }}</td>
+        <td class="px-4 py-3 text-gray-500 text-xs hidden sm:table-cell">{{ r.method }}</td>
         <td class="px-4 py-3">
-          <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">{{ r.status }}</span>
+          <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-{{ sc }}-100 text-{{ sc }}-700">{{ r.status }}</span>
         </td>
-        <td class="px-4 py-3 text-gray-400 text-xs">{{ r.created_at.strftime('%d/%m/%Y') }}</td>
+        <td class="px-4 py-3 text-gray-400 text-xs hidden sm:table-cell">{{ r.created_at.strftime('%d/%m/%Y') }}</td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
+  </div>
 </div>
 {% else %}
 <div class="bg-white rounded-xl shadow-sm p-8 text-center text-gray-400">Nenhum pedido ainda.</div>

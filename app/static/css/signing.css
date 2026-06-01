@@ -1,0 +1,24 @@
+/* Signing flow — mobile-first styles */
+* { -webkit-tap-highlight-color: transparent; }
+
+body { background: #f3f4f6; }
+
+/* Prevent rubber-band scroll interfering with canvas */
+html, body { overscroll-behavior-y: none; }
+
+/* Smooth step transitions */
+section { animation: fadeIn 0.25s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* Progress step active line */
+.step-line-active { background: #4338ca; }
+
+/* Large OTP input */
+#otp-code { font-size: 2rem; letter-spacing: 0.5em; }
+#otp-code:focus { box-shadow: 0 0 0 3px rgba(99,102,241,0.3); }
+
+/* Canvas signature */
+#signature-canvas { touch-action: none; user-select: none; }
+
+/* Floating button safe area for iOS */
+#floating-submit { padding-bottom: max(1rem, env(safe-area-inset-bottom)); }

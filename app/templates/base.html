@@ -3,26 +3,48 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}SignCert{% endblock %} - {{ config.PLATFORM_NAME }}</title>
+  <meta name="theme-color" content="#4338ca">
+  <title>{% block title %}SignCert{% endblock %} — {{ config.PLATFORM_NAME }}</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
 </head>
 <body class="bg-gray-50 text-gray-900 min-h-screen">
 
 {% if current_user.is_authenticated %}
-<nav class="bg-indigo-700 text-white shadow">
+<nav class="bg-indigo-700 text-white shadow sticky top-0 z-50">
   <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-14">
     <a href="{{ url_for('admin_dashboard.index') }}" class="font-bold text-lg tracking-tight">
       ✒️ {{ config.PLATFORM_NAME }}
     </a>
-    <div class="flex items-center gap-6 text-sm">
+    <!-- Desktop nav -->
+    <div class="hidden md:flex items-center gap-5 text-sm">
       <a href="{{ url_for('admin_documents.list_documents') }}" class="hover:text-indigo-200">Documentos</a>
       <a href="{{ url_for('admin_templates.list_templates') }}" class="hover:text-indigo-200">Templates</a>
       <a href="{{ url_for('admin_sheets.list_sheets') }}" class="hover:text-indigo-200">Planilhas</a>
       <a href="{{ url_for('admin_drive.index') }}" class="hover:text-indigo-200">Drive</a>
-      <span class="text-indigo-300">|</span>
-      <span>{{ current_user.full_name }}</span>
-      <a href="{{ url_for('auth.logout') }}" class="hover:text-red-300">Sair</a>
+      <span class="text-indigo-400">|</span>
+      <span class="text-indigo-200 text-xs">{{ current_user.full_name }}</span>
+      <a href="{{ url_for('auth.logout') }}" class="hover:text-red-300 text-xs">Sair</a>
+    </div>
+    <!-- Mobile hamburger -->
+    <button onclick="toggleMobileNav()" class="md:hidden p-2 rounded focus:outline-none" aria-label="Menu">
+      <svg id="icon-menu" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+      </svg>
+      <svg id="icon-close" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+  </div>
+  <!-- Mobile dropdown -->
+  <div id="mobile-nav" class="hidden md:hidden border-t border-indigo-600 px-4 py-3 space-y-2 text-sm">
+    <a href="{{ url_for('admin_documents.list_documents') }}" class="block py-2 hover:text-indigo-200">📄 Documentos</a>
+    <a href="{{ url_for('admin_templates.list_templates') }}" class="block py-2 hover:text-indigo-200">🗂 Templates</a>
+    <a href="{{ url_for('admin_sheets.list_sheets') }}" class="block py-2 hover:text-indigo-200">📊 Planilhas</a>
+    <a href="{{ url_for('admin_drive.index') }}" class="block py-2 hover:text-indigo-200">☁️ Google Drive</a>
+    <div class="border-t border-indigo-600 pt-2">
+      <span class="text-indigo-300 text-xs">{{ current_user.full_name }}</span>
+      <a href="{{ url_for('auth.logout') }}" class="block py-2 text-red-300 hover:text-red-200">Sair</a>
     </div>
   </div>
 </nav>
@@ -33,5 +55,13 @@
   {% block content %}{% endblock %}
 </main>
 
+<script>
+function toggleMobileNav() {
+  const nav = document.getElementById('mobile-nav');
+  const open = nav.classList.toggle('hidden');
+  document.getElementById('icon-menu').classList.toggle('hidden', !open);
+  document.getElementById('icon-close').classList.toggle('hidden', open);
+}
+</script>
 </body>
 </html>

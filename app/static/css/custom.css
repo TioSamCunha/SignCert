@@ -1,2 +1,18 @@
 /* Overrides mínimos além do TailwindCSS */
 body { font-family: 'Segoe UI', system-ui, sans-serif; }
+
+/* Touch-friendly tap targets on mobile */
+@media (max-width: 640px) {
+  button, a[role="button"], input[type="submit"] {
+    min-height: 44px;
+  }
+  /* Ensure table cells don't cause layout issues on very small screens */
+  .overflow-x-auto { -webkit-overflow-scrolling: touch; }
+}
+
+/* Active state feedback for touch */
+* { -webkit-tap-highlight-color: transparent; }
+a:active, button:active { opacity: 0.8; }
+
+/* Prevent horizontal overflow at the page level */
+body { overflow-x: hidden; }

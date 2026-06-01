@@ -18,19 +18,20 @@
   {% endfor %}
 </div>
 
-<div class="bg-white rounded-xl shadow-sm p-6">
+<div class="bg-white rounded-xl shadow-sm p-4 sm:p-6">
   <div class="flex items-center justify-between mb-4">
     <h2 class="text-lg font-semibold">Documentos Recentes</h2>
     <a href="{{ url_for('admin_documents.list_documents') }}"
        class="text-sm text-indigo-600 hover:underline">Ver todos →</a>
   </div>
   {% if stats.recent_documents %}
-  <table class="w-full text-sm">
+  <div class="overflow-x-auto -mx-4 sm:mx-0">
+  <table class="w-full text-sm min-w-[480px] sm:min-w-0">
     <thead class="text-left text-gray-500 border-b">
       <tr>
-        <th class="pb-2">Título</th>
-        <th class="pb-2">Status</th>
-        <th class="pb-2">Criado em</th>
+        <th class="pb-2 px-4 sm:px-0">Título</th>
+        <th class="pb-2 px-4 sm:px-0">Status</th>
+        <th class="pb-2 px-4 sm:px-0">Criado em</th>
       </tr>
     </thead>
     <tbody>
@@ -39,6 +40,7 @@
       {% endfor %}
     </tbody>
   </table>
+  </div>
   {% else %}
   <p class="text-gray-400 text-sm">Nenhum documento criado ainda.
     <a href="{{ url_for('admin_documents.new_document') }}" class="text-indigo-600 hover:underline">Criar primeiro →</a>

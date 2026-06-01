@@ -1,21 +1,22 @@
 {% extends 'base.html' %}
 {% block title %}Templates{% endblock %}
 {% block content %}
-<div class="flex justify-between items-center mb-6">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
   <h1 class="text-2xl font-bold">Templates de Documentos</h1>
   <a href="{{ url_for('admin_templates.new_template') }}"
-     class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700">
+     class="inline-flex items-center justify-center bg-indigo-600 text-white px-4 py-2.5 rounded-lg text-sm hover:bg-indigo-700 font-medium">
     + Novo Template
   </a>
 </div>
 {% if templates %}
 <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-  <table class="w-full text-sm">
+  <div class="overflow-x-auto">
+  <table class="w-full text-sm min-w-[480px]">
     <thead class="bg-gray-50 text-gray-500 text-left">
       <tr>
         <th class="px-4 py-3">Nome</th>
-        <th class="px-4 py-3">Variáveis</th>
-        <th class="px-4 py-3">Criado em</th>
+        <th class="px-4 py-3 hidden sm:table-cell">Variáveis</th>
+        <th class="px-4 py-3 hidden sm:table-cell">Criado em</th>
         <th class="px-4 py-3">Ações</th>
       </tr>
     </thead>
@@ -23,7 +24,7 @@
       {% for t in templates %}
       <tr class="hover:bg-gray-50">
         <td class="px-4 py-3 font-medium">{{ t.name }}</td>
-        <td class="px-4 py-3 text-gray-500">
+        <td class="px-4 py-3 text-gray-500 hidden sm:table-cell">
           {% for v in t.variables_schema[:4] %}
           <span class="bg-indigo-50 text-indigo-600 text-xs px-1.5 py-0.5 rounded mr-1">{{ v.name }}</span>
           {% endfor %}
@@ -31,19 +32,22 @@
           <span class="text-gray-400 text-xs">+{{ t.variables_schema|length - 4 }}</span>
           {% endif %}
         </td>
-        <td class="px-4 py-3 text-gray-400">{{ t.created_at.strftime('%d/%m/%Y') }}</td>
-        <td class="px-4 py-3 flex gap-2">
+        <td class="px-4 py-3 text-gray-400 hidden sm:table-cell">{{ t.created_at.strftime('%d/%m/%Y') }}</td>
+        <td class="px-4 py-3">
+          <div class="flex gap-3 items-center">
           <a href="{{ url_for('admin_templates.edit_template', tpl_id=t.id) }}"
              class="text-indigo-600 hover:underline text-xs">Editar</a>
           <form method="POST" action="{{ url_for('admin_templates.preview_pdf', tpl_id=t.id) }}">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <button class="text-green-600 hover:underline text-xs">Preview PDF</button>
+            <button class="text-green-600 hover:underline text-xs">Preview</button>
           </form>
+          </div>
         </td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
+  </div>
 </div>
 {% else %}
 <div class="bg-white rounded-xl shadow-sm p-8 text-center text-gray-400">
