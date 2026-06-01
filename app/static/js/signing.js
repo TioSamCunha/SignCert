@@ -109,7 +109,12 @@ document.addEventListener('DOMContentLoaded', () => {
 function initCanvas() {
   const canvas = document.getElementById('signature-canvas');
   if (!canvas) return;
-  if (signaturePad) return;
+  // Skip if already initialized with a valid width
+  if (signaturePad && canvas.offsetWidth > 0 && canvas.width > 0) return;
+  if (signaturePad) {
+    signaturePad.off();
+    signaturePad = null;
+  }
   const ratio = Math.max(window.devicePixelRatio || 1, 1);
   canvas.width = canvas.offsetWidth * ratio;
   canvas.height = 160 * ratio;
