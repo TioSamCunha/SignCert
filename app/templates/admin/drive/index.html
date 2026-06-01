@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Google Drive{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto">
+  <h1 class="text-2xl font-bold mb-6">Guarda de Documentos — Google Drive</h1>
+  {% include 'components/flash_messages.html' %}
+  {% if config %}
+  <div class="bg-green-50 border border-green-300 rounded-xl p-6 mb-4">
+    <h2 class="font-semibold text-green-700 mb-2">✅ Google Drive Configurado</h2>
+    <p class="text-sm text-gray-600">Documentos concluídos são enviados automaticamente para o Drive.</p>
+    {% if config.folder_id %}
+    <p class="text-xs text-gray-400 mt-1">Pasta: <code>{{ config.folder_id }}</code></p>
+    {% endif %}
+    <div class="mt-4 flex gap-3">
+      <a href="{{ url_for('admin_drive.setup') }}"
+         class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700">
+        Atualizar Configuração
+      </a>
+      <form method="POST" action="{{ url_for('admin_drive.disable') }}"
+            onsubmit="return confirm('Desativar integração com Drive?')">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="bg-red-50 text-red-600 border border-red-200 px-4 py-2 rounded-lg text-sm hover:bg-red-100">
+          Desativar
+        </button>
+      </form>
+    </div>
+  </div>
+  {% else %}
+  <div class="bg-white rounded-xl shadow-sm p-6">
+    <p class="text-gray-500 mb-4">Nenhuma integração configurada. Conecte o Google Drive para guardar automaticamente os documentos assinados.</p>
+    <a href="{{ url_for('admin_drive.setup') }}"
+       class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm hover:bg-indigo-700">
+      Configurar Google Drive
+    </a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

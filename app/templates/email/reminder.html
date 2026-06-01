@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"></head>
+<body style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto; padding: 20px;">
+  <h2 style="color: #4338ca;">✒️ {{ platform }}</h2>
+  <p>Olá, <strong>{{ sig_req.signatory_name }}</strong>!</p>
+  <p>Este é um lembrete de que o documento abaixo ainda aguarda a sua assinatura:</p>
+  <blockquote style="border-left: 4px solid #f59e0b; padding: 8px 16px; color: #555;">
+    {{ sig_req.document.title }}
+  </blockquote>
+  <p>Por favor, assine antes que o prazo expire.</p>
+  <p style="text-align: center; margin: 30px 0;">
+    <a href="{{ signing_url }}"
+       style="background:#4338ca;color:white;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:bold;">
+      Assinar Agora
+    </a>
+  </p>
+  <hr style="border-color:#eee;">
+  <p style="font-size:11px; color:#aaa;">{{ platform }} — Plataforma de Assinaturas Eletrônicas</p>
+</body>
+</html>

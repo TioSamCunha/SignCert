@@ -19,6 +19,7 @@
       <a href="{{ url_for('admin_documents.list_documents') }}" class="hover:text-indigo-200">Documentos</a>
       <a href="{{ url_for('admin_templates.list_templates') }}" class="hover:text-indigo-200">Templates</a>
       <a href="{{ url_for('admin_sheets.list_sheets') }}" class="hover:text-indigo-200">Planilhas</a>
+      <a href="{{ url_for('admin_drive.index') }}" class="hover:text-indigo-200">Drive</a>
       <span class="text-indigo-300">|</span>
       <span>{{ current_user.full_name }}</span>
       <a href="{{ url_for('auth.logout') }}" class="hover:text-red-300">Sair</a>

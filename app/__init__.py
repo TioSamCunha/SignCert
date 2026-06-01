@@ -16,7 +16,18 @@ def create_app(config_name: str = None) -> Flask:
     _register_shell_context(app)
     _ensure_upload_dirs(app)
 
+    if config_name != 'testing':
+        _start_scheduler(app)
+
     return app
+
+
+def _start_scheduler(app: Flask) -> None:
+    try:
+        from app.scheduler import init_scheduler
+        init_scheduler(app)
+    except Exception:
+        pass
 
 
 def _init_extensions(app: Flask) -> None:
@@ -67,6 +78,11 @@ def _register_admin_blueprints(app: Flask) -> None:
         app.register_blueprint(signatories_bp)
     except ImportError:
         pass
+    try:
+        from app.routes.admin.drive import bp as drive_bp
+        app.register_blueprint(drive_bp)
+    except ImportError:
+        pass
 
 
 def _register_signing_blueprints(app: Flask) -> None:
@@ -83,6 +99,11 @@ def _register_signing_blueprints(app: Flask) -> None:
     try:
         from app.routes.signing.submit import bp as submit_bp
         app.register_blueprint(submit_bp)
+    except ImportError:
+        pass
+    try:
+        from app.routes.signing.digital_cert import bp as digital_cert_bp
+        app.register_blueprint(digital_cert_bp)
     except ImportError:
         pass
 
